@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript">
+		// use vanilla JS because why not
+		window.addEventListener("load", function() {
+
+			// create websocket instance
+			var mySocket = new WebSocket("ws://" + location.hostname + ":8083");
+
+			// add event listener reacting when message is received
+			var form = document.getElementsByClassName("console");
+			var input = document.getElementById("uart_input");
+			form[0].addEventListener("submit", function (e) {
+				// on forms submission send input to our server
+				input_text = input.value;
+				mySocket.send(input_text);
+				e.preventDefault()
+			})
+
+			var console_form = document.getElementsByClassName("console");
+			var console_field = document.getElementById("console_inp");
+			var autoscroll_cbox = document.getElementById("autoscroll_box");
+			mySocket.onmessage = function (event) {
+				console_field.value += event.data;
+				if (autoscroll_cbox.checked){
+					console_field.scrollTop = console_field.scrollHeight
+				};
+			};
+		});
+	</script>
+	<style>
+		/* just some super basic css to make things bit more readable */
+		html {
+			height: 100%;
+		}
+		body {
+			background-color: #222222;
+			color: #BFC0C0;
+			font-family: sans-serif;
+			height: 100%;
+		}
+		#uart {
+			float: left;
+			width: 50%;
+			margin: 1em;
+			height: 50%;
+		}
+		#video-canvas {
+			float: right;
+			margin: 2%;
+			width: 40%
+		}
+		#console_inp {
+			height: 90%;
+			width: 100%;
+			overflow-y: auto;
+			resize: none;
+			margin-bottom: 10px;
+		}	
+		#console_form{
+			height: 100%;
+			width: 100%
+
+		}
+		#uart_menu {
+			float: right;
+		}
+		#line_menu {
+			margin-left: 20px;
+		}
+		#baudrate{
+			margin-left: 20px;
+			width: 95px;
+		}
+		#dbg_ctrl{
+			margin-top: 3%;
+		}
+		#debug {
+			float: right;
+			margin-right: 5%;
+			margin-top: 2%;
+		}
+		#buttons_tbl{
+
+		}
+		#buttons{
+			width: 50%;
+			float: left;
+			margin: 3%;		
+		}
+		#buttons button{
+			width: 90px;
+			margin: 2px;
+		}
+		#uart_input {
+			width: 86.8%;
+			margin-bottom: 2px;
+		}
+		#uart_input_button {
+			width: 12%;
+		}
+		#cleared {
+			clear: both;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="uart">
+		<form class="console" id=console_form>
+			<input id="uart_input"></input>
+			<input type="submit" id=uart_input_button></input><br>
+			<textarea id="console_inp" readonly></textarea>			
+		</form>
+		<form class="foo" id="uart_menu">
+			<input type="checkbox" id="autoscroll_box" checked="true">
+    		<label for="autoscroll_box">Автопрокрутка</label>
+		</form>
+	</div>
+</body>
+</html>
